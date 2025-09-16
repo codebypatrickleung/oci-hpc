@@ -38,7 +38,7 @@ resource "oci_core_instance" "compute_cluster_instances" {
 
   metadata = {
     ssh_authorized_keys = file("/home/${var.controller_username}/.ssh/id_rsa.pub")
-    user_data           = base64encode(data.template_file.config.rendered)
+  user_data           = base64encode(local.config)
   }
   source_details {
     source_id = local.cluster_network_image

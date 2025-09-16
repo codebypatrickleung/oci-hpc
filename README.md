@@ -1,11 +1,65 @@
-# Stack to create an HPC cluster. 
+This is a modified version of the original Oracle HPC Terraform stack. The following changes have been made:
+
+- Removed the use of the template provider as it has been deprecated.
+- Added instructions to use OpenTofu (https://opentofu.org/) to deploy the stack.
+- Added an additional .gitignore file to ignore Terraform files.
+- Updated README.md to provide instructions for deployment via OpenTofu.
+
+# Deploy using OpenTofu
+
+## Clone the repository
+```
+git clone https://github.com/oracle-quickstart/oci-hpc.git
+cd oci-hpc
+```
+
+## Initialize OpenTofu
+Authenticate with the OCI CLI. The default profile is used here; adjust as needed.
+```
+oci session authenticate
+```
+
+Before deploying the stack, initialize OpenTofu in the directory where the Terraform files are located.
+```
+tofu init
+```
+
+## Create a terraform.tfvars file
+Create a file named `terraform.tfvars` in the same directory as the Terraform files. This file will contain the variable values needed for the deployment. Below is an example of what the file could look like. Adjust the values as needed for your environment.
+
+```
+region                        = "your-region"
+tenancy_ocid                  = "ocid1.tenancy.oc1..exampleuniqueID"
+targetCompartment             = "ocid1.compartment.oc1..exampleuniqueID"
+vcn_compartment               = "ocid1.compartment.oc1..exampleuniqueID"
+ad                            = "fyxu:EU-FRANKFURT-1-AD-2"
+login_ad                      = "fyxu:EU-FRANKFURT-1-AD-2"
+controller_ad                 = "fyxu:EU-FRANKFURT-1-AD-2"
+ssh_key                       = "ssh-rsa AAAA... your-ssh-public-key"
+controller_boot_volume_size   = 1024
+controller_boot_volume_backup = false
+```
+
+## Apply OpenTofu
+Deploy the stack:
+```
+tofu apply
+```
+
+## Clean up
+Once you are done with testing, you can destroy the resources created by the stack with:
+```
+tofu destroy
+```
+
+# Stack to create an HPC cluster
 
 [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/oci-hpc/archive/refs/heads/master.zip)
 
 ## Create a dynamic group
-For customer tenancies, check or create dynamic group. In OCI Console, navigate to Identity->Domains->Default domain->Dynamic groups, create a dynamic group e.g. instance_principal with `Any {instance.compartment.id = 'ocid1.compartment.oc1.example-ocid'}`. Though this provides a liberal access for the instance principal, it is recommended to narrow the scope depending on customer's security posture requirements. If you change the name of policy, be sure make the change in the policy examples that follow this section. Currently they all assume that you named the dynamic group as `instance_principal`.
+For customer tenancies, check or create a dynamic group. In the OCI Console, navigate to Identity -> Domains -> Default domain -> Dynamic groups, and create a dynamic group (e.g., `instance_principal`) with `Any {instance.compartment.id = 'ocid1.compartment.oc1.example-ocid'}`. Although this provides liberal access for the instance principal, it is recommended to narrow the scope depending on your security posture requirements. If you change the name of the policy, be sure to update the policy examples that follow this section. Currently, they all assume that you named the dynamic group `instance_principal`.
 
-## Policies to deploy the stack: 
+## Policies to deploy the stack:
 ```
 allow service compute_management to use tag-namespace in tenancy
 allow service compute_management to manage compute-management-family in tenancy
@@ -13,7 +67,7 @@ allow service compute_management to read app-catalog-listing in tenancy
 allow group user to manage all-resources in compartment compartmentName
 ```
 ## Policies for autoscaling or resizing:
-As described when you specify your variables, if you select instance-principal as way of authenticating your node, make sure your generate a dynamic group and give the following policies to it: 
+As described when you specify your variables, if you select instance-principal as the method of authenticating your node, make sure you generate a dynamic group and give the following policies to it:
 ```
 Allow dynamic-group instance_principal to read app-catalog-listing in tenancy
 Allow dynamic-group instance_principal to use tag-namespace in tenancy

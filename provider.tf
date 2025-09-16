@@ -5,3 +5,9 @@
 #private_key_path = "${var.private_key_path}"
 #region           = "${var.region}"
 #}
+
+provider "oci" {
+  region              = "eu-frankfurt-1"
+  auth                = "SecurityToken"
+  config_file_profile = "DEFAULT"
+}

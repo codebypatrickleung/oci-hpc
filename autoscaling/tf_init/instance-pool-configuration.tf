@@ -16,7 +16,7 @@ resource "oci_core_instance_configuration" "instance_pool_configuration" {
       metadata = {
 # TODO: add user key to the authorized_keys 
         ssh_authorized_keys = file("/home/${var.controller_username}/.ssh/id_rsa.pub")
-        user_data           = base64encode(data.template_file.config.rendered)
+  user_data           = base64encode(local.config)
       }
       agent_config {
 
