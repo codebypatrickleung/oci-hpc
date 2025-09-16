@@ -1,5 +1,7 @@
-data "template_file" "config" {
-  template = file("config.hpc")
+
+# Replaced template_file data source with templatefile() function usage
+locals {
+  config = templatefile("config.hpc", {})
 }
 
 
