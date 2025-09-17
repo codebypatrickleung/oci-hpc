@@ -1,9 +1,9 @@
-This is a modified version of the original Oracle HPC Terraform stack. The following changes have been made:
+This is a modified version of the original [Oracle HPC Terraform stack](https://github.com/oracle-quickstart/oci-hpc). The following changes have been made:
 
-- Removed the use of the template provider as it has been deprecated.
-- Added instructions to use OpenTofu (https://opentofu.org/) to deploy the stack.
+- Removed the use of the Terraform template provider since Terraform provider template v2.2.0 does not support your platform (darwin_arm64, i.e., Apple Silicon/M1/M2 Mac)
+- Added a provider blog to use Token based authentication 
+- Added instructions to use [OpenTofu](https://opentofu.org/) to deploy the stack.
 - Added an additional .gitignore file to ignore Terraform files.
-- Updated README.md to provide instructions for deployment via OpenTofu.
 
 # Deploy using OpenTofu
 
@@ -25,19 +25,39 @@ tofu init
 ```
 
 ## Create a terraform.tfvars file
-Create a file named `terraform.tfvars` in the same directory as the Terraform files. This file will contain the variable values needed for the deployment. Below is an example of what the file could look like. Adjust the values as needed for your environment.
+Create a file named `terraform.tfvars` in the same directory as the Terraform files. This file will contain the variable values needed for the deployment of a cluster network with 2 node using BM.HPC.36 shape. Below is an example of what the file could look like. Adjust the values as needed for your environment.
 
 ```
-region                        = "your-region"
-tenancy_ocid                  = "ocid1.tenancy.oc1..exampleuniqueID"
-targetCompartment             = "ocid1.compartment.oc1..exampleuniqueID"
-vcn_compartment               = "ocid1.compartment.oc1..exampleuniqueID"
-ad                            = "fyxu:EU-FRANKFURT-1-AD-2"
-login_ad                      = "fyxu:EU-FRANKFURT-1-AD-2"
-controller_ad                 = "fyxu:EU-FRANKFURT-1-AD-2"
-ssh_key                       = "ssh-rsa AAAA... your-ssh-public-key"
+region            = "your-region"
+tenancy_ocid      = "ocid1.tenancy.oc1..exampleuniqueID"
+targetCompartment = "ocid1.compartment.oc1..exampleuniqueID"
+vcn_compartment   = "ocid1.compartment.oc1..exampleuniqueID"
+ad                = "fyxu:EU-FRANKFURT-1-AD-2"
+
+ssh_key = "ssh-rsa AAAAexamplekeyhere user@example.com"
+
+# Global Configuration
+slurm           = true
+monitoring_node = false
+
+# Controller Node Configuration 
+controller_shape              = "VM.Standard.E5.Flex"
+controller_memory             = 4
+controller_ocpus              = 1
 controller_boot_volume_size   = 1024
 controller_boot_volume_backup = false
+controller_ad                 = "fyxu:EU-FRANKFURT-1-AD-2"
+
+# Login Node Configuration
+login_shape  = "VM.Standard.E5.Flex"
+login_memory = 4
+login_ocpus  = 1
+login_ad     = "fyxu:EU-FRANKFURT-1-AD-2"
+
+# Cluster Network Configuration
+cluster_network       = true
+node_count            = 2
+cluster_network_shape = "BM.HPC2.36"
 ```
 
 ## Apply OpenTofu
